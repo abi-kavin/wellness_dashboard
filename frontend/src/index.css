@@ -5,12 +5,17 @@
 :root {
   --primary: #3b82f6;
   --secondary: #6366f1;
-  --background: #f8fafc;
+  --background: #f1f5f9;
   --text-main: #1e293b;
 }
 
 body {
   background-color: var(--background);
+  background-image:
+    radial-gradient(at 20% 20%, hsla(217, 100%, 90%, 0.5) 0px, transparent 50%),
+    radial-gradient(at 80% 10%, hsla(252, 100%, 92%, 0.4) 0px, transparent 50%),
+    radial-gradient(at 60% 80%, hsla(190, 80%, 88%, 0.35) 0px, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }

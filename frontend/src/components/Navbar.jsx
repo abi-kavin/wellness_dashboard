@@ -1,16 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { getUnreadCount } from '../services/api.js';
+
+// Routes that use the new Sidebar OR are auth-only — Navbar should be hidden there
+const SIDEBAR_ROUTES = [
+    '/login', '/register',
+    '/faculty-login', '/faculty-register', '/student-login',
+    '/faculty-dashboard', '/students', '/analytics',
+    '/reports', '/alerts', '/settings',
+    '/create-student',
+];
 
 const Navbar = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const [unreadCount, setUnreadCount] = useState(0);
+
+    // Hide on faculty sidebar pages or edit-student routes
+    const isSidebarPage = SIDEBAR_ROUTES.includes(pathname)
+        || pathname.startsWith('/edit-student')
+        || pathname.startsWith('/students');
+    if (isSidebarPage) return null;
 
     useEffect(() => {
         if (userInfo && userInfo.role === 'student') {
             fetchUnreadCount();
-            const interval = setInterval(fetchUnreadCount, 30000); // Poll every 30s
+            const interval = setInterval(fetchUnreadCount, 30000);
             return () => clearInterval(interval);
         }
     }, []);
@@ -54,12 +70,7 @@ const Navbar = () => {
                                 </div>
                             )}
                             <span className="hidden md:inline text-slate-600 mr-2">Hello, {userInfo.name}</span>
-                            <button
-                                onClick={logoutHandler}
-                                className="btn-secondary"
-                            >
-                                Logout
-                            </button>
+                            <button onClick={logoutHandler} className="btn-secondary">Logout</button>
                         </>
                     ) : (
                         <>
@@ -75,3 +86,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
