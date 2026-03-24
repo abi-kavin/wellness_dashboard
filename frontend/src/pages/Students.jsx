@@ -35,7 +35,7 @@ const TrashIcon = ({ size = 16 }) => (
 
 const RiskBadge = ({ level }) => {
     const styles = {
-        High: 'bg-red-50 text-red-600 border border-red-200',
+        High: 'bg-rose-50 text-rose-600 border border-rose-200',
         Medium: 'bg-amber-50 text-amber-600 border border-amber-200',
         Low: 'bg-emerald-50 text-emerald-600 border border-emerald-200',
     };
@@ -93,8 +93,9 @@ const Students = () => {
 
     if (loading) return (
         <FacultyLayout>
-            <div className="flex items-center justify-center h-64">
-                <div className="h-10 w-10 rounded-full border-4 border-violet-500/30 border-t-violet-500 animate-spin" />
+            <div className="flex flex-col items-center justify-center h-96 gap-4">
+                <div className="h-10 w-10 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin" />
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 animate-pulse italic">Scanning Directory Records…</p>
             </div>
         </FacultyLayout>
     );
@@ -106,120 +107,120 @@ const Students = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-4xl font-black tracking-tight text-slate-800">Student Directory</h1>
-                        <p className="text-slate-400 font-medium text-sm mt-0.5">Holistic Overview of Institutional Enrolment</p>
+                        <h1 className="text-4xl font-bold tracking-tight text-slate-900">Student <span className="text-blue-600 italic">Core</span></h1>
+                        <p className="text-slate-500 font-bold text-sm mt-0.5 italic">Institutional Academic Census & Wellness Telemetry</p>
                     </div>
                     <button
                         onClick={() => navigate('/create-student')}
-                        className="group relative flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-violet-500/30 transition-all hover:scale-105 hover:shadow-violet-500/40"
-                        style={{ background: 'linear-gradient(to right, #7c3aed, #6366f1)' }}
+                        className="group relative flex items-center gap-2 rounded-2xl px-6 py-3.5 text-[10px] font-black uppercase tracking-widest text-white shadow-2xl transition-all hover:scale-105 active:scale-95 border border-white/20"
+                        style={{ background: 'linear-gradient(135deg, #2563eb, #4f46e5)' }}
                     >
                         <span className="transition-transform group-hover:rotate-90"><PlusIcon /></span>
-                        Onboard Student
+                        Synchronize Student
                     </button>
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-wrap items-center gap-4 bg-white/50 p-4 rounded-3xl border border-white/60 backdrop-blur-md shadow-sm">
+                <div className="flex flex-wrap items-center gap-4 bg-white/70 p-4 rounded-3xl border border-slate-200 backdrop-blur-2xl shadow-xl">
                     <div className="relative flex-1 min-w-[280px] h-12">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><SearchIcon /></span>
                         <input
                             type="text"
-                            placeholder="Search by name, register number or email…"
+                            placeholder="Identify by identity, index or network address…"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            className="w-full h-full pl-11 pr-4 bg-white/60 border border-white/70 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400/30 transition-all"
+                            className="w-full h-full pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-inner"
                         />
                     </div>
-                    <div className="flex p-1 bg-white/70 rounded-2xl border border-white/80 shadow-inner gap-1">
+                    <div className="flex p-1 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner gap-1">
                         {['All', 'Low', 'Medium', 'High'].map(level => (
                             <button
                                 key={level}
                                 onClick={() => setFilterRisk(level)}
-                                className={`rounded-xl px-5 py-2 text-xs font-black uppercase tracking-widest transition-all ${filterRisk === level
-                                    ? 'text-white shadow-md'
-                                    : 'text-slate-400 hover:text-violet-600 hover:bg-white/80'
+                                className={`rounded-xl px-5 py-2 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${filterRisk === level
+                                    ? 'text-white shadow-lg'
+                                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
                                     }`}
-                                style={filterRisk === level ? { background: 'linear-gradient(to right, #7c3aed, #6366f1)' } : {}}
+                                style={filterRisk === level ? { background: 'linear-gradient(135deg, #2563eb, #4f46e5)' } : {}}
                             >
                                 {level}
                             </button>
                         ))}
                     </div>
-                    <span className="ml-auto text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:block">
-                        {filtered.length} student{filtered.length !== 1 ? 's' : ''}
+                    <span className="ml-auto text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden md:block">
+                        {filtered.length} NODES INDEXED
                     </span>
                 </div>
 
                 {/* Table */}
-                <div className="rounded-3xl border border-white/50 bg-white/40 overflow-hidden shadow-2xl backdrop-blur-md">
+                <div className="rounded-3xl border border-slate-200 bg-white/70 overflow-hidden shadow-xl backdrop-blur-2xl">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="bg-white/50 border-b border-white/60">
-                                    {['Student Identity', 'Email', 'Department', 'Attendance', 'Marks', 'Stress', 'Risk', 'Operations'].map(h => (
-                                        <th key={h} className="px-6 py-5 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">{h}</th>
+                                <tr className="bg-slate-50 border-b border-slate-200">
+                                    {['Student Identity', 'Email Address', 'Dept', 'Attn', 'Metrics', 'Stress', 'Risk', 'Process'].map(h => (
+                                        <th key={h} className="px-6 py-5 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-slate-100">
                                 {filtered.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="px-6 py-16 text-center text-slate-300 text-sm font-semibold">
+                                        <td colSpan={8} className="px-6 py-16 text-center text-slate-500 text-sm font-semibold">
                                             No students found. Try adjusting your search or filters.
                                         </td>
                                     </tr>
                                 ) : filtered.map(student => (
                                     <tr
                                         key={student._id}
-                                        className={`group hover:bg-white/50 transition-all border-b border-white/30 last:border-0 cursor-pointer ${riskBorderColor(student.riskLevel)}`}
+                                        className={`group hover:bg-slate-50 transition-all cursor-pointer ${riskBorderColor(student.riskLevel)} border-l-transparent border-l-4 hover:border-l-blue-600`}
                                         onClick={() => navigate(`/students/${student._id}`)}
                                     >
                                         {/* Identity */}
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl font-black text-lg transition-all duration-500 group-hover:text-white flex-shrink-0"
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl font-bold text-lg transition-all duration-500 overflow-hidden relative group-hover:shadow-lg flex-shrink-0"
                                                     style={{
-                                                        background: 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.1))',
+                                                        background: '#f8fafc',
+                                                        border: '1px solid #e2e8f0'
                                                     }}
-                                                    onMouseEnter={e => e.currentTarget.style.background = 'linear-gradient(135deg, #7c3aed, #6366f1)'}
-                                                    onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.1))'}
                                                 >
-                                                    <span style={{ color: 'inherit' }}>{student.name.charAt(0)}</span>
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    <span className="relative z-10 text-blue-600 group-hover:text-blue-700 transition-colors">{student.name.charAt(0)}</span>
                                                 </div>
                                                 <div>
-                                                    <p className="font-black text-slate-800 group-hover:text-violet-600 transition-colors">{student.name}</p>
+                                                    <p className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{student.name}</p>
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{student.registerNumber}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         {/* Email */}
                                         <td className="px-6 py-5">
-                                            <span className="text-xs font-medium text-slate-500">{student.email}</span>
+                                            <span className="text-xs font-semibold text-slate-400">{student.email}</span>
                                         </td>
                                         {/* Dept */}
                                         <td className="px-6 py-5">
-                                            <span className="px-3 py-1 rounded-xl bg-white/70 border border-white/80 text-[10px] font-black uppercase tracking-widest text-slate-500">{student.department}</span>
+                                            <span className="px-3 py-1 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-bold uppercase tracking-widest text-slate-500">{student.department}</span>
                                         </td>
                                         {/* Attendance */}
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-2">
-                                                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${student.attendance >= 75 ? 'bg-emerald-500' : 'bg-red-400'}`} />
-                                                <span className={`font-bold ${student.attendance >= 75 ? 'text-slate-700' : 'text-red-500'}`}>{student.attendance}%</span>
+                                                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${student.attendance >= 75 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.3)]'}`} />
+                                                <span className={`font-bold ${student.attendance >= 75 ? 'text-slate-700' : 'text-rose-600'}`}>{student.attendance}%</span>
                                             </div>
                                         </td>
                                         {/* Marks */}
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex-1 min-w-[60px] h-1.5 bg-white/50 rounded-full overflow-hidden border border-white/60">
+                                                <div className="flex-1 min-w-[60px] h-1.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                                                     <div className="h-full rounded-full" style={{ width: `${student.marks}%`, background: 'linear-gradient(to right, #7c3aed, #6366f1)' }} />
                                                 </div>
-                                                <span className="text-xs font-black text-violet-600 w-6">{student.marks}</span>
+                                                <span className="text-xs font-bold text-violet-600 w-6">{student.marks}</span>
                                             </div>
                                         </td>
                                         {/* Stress */}
                                         <td className="px-6 py-5">
-                                            <span className={`text-xs font-bold ${student.stressLevel === 'High' ? 'text-red-500' : student.stressLevel === 'Medium' ? 'text-amber-500' : 'text-emerald-600'}`}>
+                                            <span className={`text-xs font-bold ${student.stressLevel === 'High' ? 'text-rose-600' : student.stressLevel === 'Medium' ? 'text-amber-600' : 'text-emerald-600'}`}>
                                                 {student.stressLevel}
                                             </span>
                                         </td>
@@ -231,23 +232,23 @@ const Students = () => {
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                                                 <button
-                                                    title="Send Message"
+                                                    title="Transmit Message"
                                                     onClick={() => { setSelectedStudent(student); setIsMessaging(true); }}
-                                                    className="p-2.5 rounded-xl bg-white/60 text-slate-400 hover:bg-sky-500 hover:text-white hover:shadow-lg transition-all border border-white/60"
+                                                    className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-600 hover:text-white border border-slate-200 transition-all shadow-sm"
                                                 >
                                                     <MessageIcon />
                                                 </button>
                                                 <button
-                                                    title="Edit Parameters"
+                                                    title="Configure Parameters"
                                                     onClick={() => navigate(`/edit-student/${student._id}`)}
-                                                    className="p-2.5 rounded-xl bg-white/60 text-slate-400 hover:bg-violet-600 hover:text-white hover:shadow-lg transition-all border border-white/60"
+                                                    className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-blue-700 hover:text-white border border-slate-200 transition-all shadow-sm"
                                                 >
                                                     <EditIcon />
                                                 </button>
                                                 <button
-                                                    title="Remove Record"
+                                                    title="Purge Record"
                                                     onClick={(e) => handleDelete(student._id, e)}
-                                                    className="p-2.5 rounded-xl bg-white/60 text-slate-400 hover:bg-red-500 hover:text-white hover:shadow-lg transition-all border border-white/60"
+                                                    className="p-2.5 rounded-xl bg-slate-50 text-slate-400 hover:bg-red-600 hover:text-white border border-slate-200 transition-all shadow-sm"
                                                 >
                                                     <TrashIcon />
                                                 </button>

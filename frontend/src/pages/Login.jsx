@@ -1,31 +1,27 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { facultyLogin, studentLogin } from '../services/api';
+import logo from '../assets/logo.png';
 
-/* ── Inline Icons ── */
-const HeartIcon = () => (
-    <svg width="22" height="22" fill="white" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-);
-const EyeIcon = ({ open }) => open ? (
-    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-    </svg>
-) : (
-    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" />
+/* ── Professional Icons ── */
+const UserIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="opacity-50">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
     </svg>
 );
 
-const departments = ['CSE', 'ECE', 'IT', 'MECH', 'CIVIL', 'BIO', 'AGRI', 'FT', 'BT'];
+const LockIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="opacity-50">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+);
 
 const Login = () => {
     const navigate = useNavigate();
     const [role, setRole] = useState('faculty');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -44,196 +40,142 @@ const Login = () => {
                 navigate('/student-dashboard');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+            setError(err.response?.data?.message || 'Access protocol denied. Terminal credentials required.');
         } finally {
             setLoading(false);
         }
     };
 
-    const features = [
-        { icon: '📈', title: 'Predictive Analytics', desc: 'AI-driven student risk modelling' },
-        { icon: '🛡️', title: 'Institutional Shield', desc: 'Data protection & student privacy' },
-        { icon: '🎯', title: 'Precision Impact', desc: 'Targeted wellness interventions' },
-    ];
-
     return (
-        <div className="min-h-screen flex bg-slate-50 relative overflow-hidden">
-
-            {/* ── Left Brand Panel ── */}
-            <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-12"
-                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #38bdf8 100%)' }}>
-                {/* decorative blobs */}
-                <div className="absolute top-[-80px] right-[-80px] h-64 w-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-                <div className="absolute bottom-[-80px] left-[-60px] h-72 w-72 rounded-full bg-sky-300/20 blur-3xl pointer-events-none" />
-                <div className="absolute inset-0 opacity-10 pointer-events-none"
-                    style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-
-                {/* Logo */}
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 border border-white/30 shadow-lg">
-                        <HeartIcon />
-                    </div>
-                    <div>
-                        <p className="text-white font-black text-sm tracking-wide">Wellness AI</p>
-                        <p className="text-white/70 text-[10px] uppercase tracking-widest font-semibold">Risk Analytics</p>
-                    </div>
-                </div>
-
-                {/* Hero text */}
-                <div className="relative z-10 space-y-10">
-                    <div>
-                        <h1 className="font-black text-6xl text-white tracking-tighter leading-none mb-4">
-                            Academic<br />
-                            <span className="text-white/70">Wellness.</span>
-                        </h1>
-                        <p className="text-xl font-bold text-white/80 leading-relaxed max-w-sm">
-                            Strategic Institutional Wellness & Risk Assessment Dashboard.
-                        </p>
-                    </div>
-                    <div className="space-y-6">
-                        {features.map((f, i) => (
-                            <div key={i} className="flex items-center gap-5 group cursor-default">
-                                <div className="text-3xl transition-transform group-hover:scale-125 duration-500">{f.icon}</div>
-                                <div>
-                                    <h3 className="font-black text-lg text-white group-hover:translate-x-1 transition-transform">{f.title}</h3>
-                                    <p className="text-sm font-bold text-white/60">{f.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="relative z-10 text-white/60 text-xs font-medium">
-                    🔒 Secured & encrypted registry system
-                </div>
+        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-50 font-['Plus_Jakarta_Sans']">
+            {/* ── Background Elements ── */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-blue-100/50 blur-[120px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-100/50 blur-[120px]" />
             </div>
 
-            {/* ── Right Form Panel ── */}
-            <div className="flex-1 flex items-center justify-center p-6 lg:p-14 overflow-y-auto">
-                <div className="w-full max-w-sm space-y-8">
-
-                    {/* Mobile logo */}
-                    <div className="flex lg:hidden items-center gap-3 mb-2">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl shadow-md"
-                            style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
-                            <HeartIcon />
-                        </div>
-                        <span className="font-black text-lg text-slate-800">Wellness AI</span>
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full max-w-[480px] p-4 z-10"
+            >
+                <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-100 p-10 sm:p-14 relative overflow-hidden text-center">
+                    {/* Header */}
+                    <div className="mb-10 flex flex-col items-center text-center">
+                        <motion.img 
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            src={logo} 
+                            alt="Logo" 
+                            className="h-20 w-auto object-contain mb-8 filter drop-shadow-sm" 
+                        />
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+                            Welcome Back
+                        </h1>
+                        <p className="text-sm font-medium text-slate-500">
+                             Please enter your credentials to access the system
+                        </p>
                     </div>
 
-                    <div>
-                        <h2 className="text-3xl font-black tracking-tight text-slate-800 leading-tight">
-                            Authorize <br />
-                            <span className="text-violet-600 italic">Access.</span>
-                        </h2>
-                        <p className="text-xs font-medium text-slate-400 mt-2">Welcome back. Enter your secure registry credentials.</p>
+                    {/* Role Selector */}
+                    <div className="flex p-1.5 bg-slate-100/80 rounded-2xl mb-10">
+                        <button
+                            type="button"
+                            onClick={() => { setRole('faculty'); setError(''); }}
+                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 ${role === 'faculty' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                             Faculty Node
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setRole('student'); setError(''); }}
+                            className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 ${role === 'student' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                             Student Node
+                        </button>
                     </div>
 
-                    {/* Role Tabs */}
-                    <div className="flex p-1 bg-slate-100 rounded-2xl gap-1">
-                        {[
-                            { key: 'faculty', label: '🎓 Faculty' },
-                            { key: 'student', label: '📚 Student' },
-                        ].map(r => (
-                            <button
-                                key={r.key}
-                                type="button"
-                                onClick={() => { setRole(r.key); setError(''); }}
-                                className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-200 ${role === r.key
-                                        ? 'bg-white text-violet-600 shadow-md'
-                                        : 'text-slate-400 hover:text-slate-600'
-                                    }`}
-                            >
-                                {r.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
-                                {role === 'faculty' ? 'Faculty Email' : 'Student Email'}
-                            </label>
-                            <input
-                                type="email"
-                                required
-                                placeholder={role === 'faculty' ? 'Enter your email address' : 'Enter your student email'}
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                                className="w-full h-12 px-5 bg-white/70 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all font-semibold text-slate-800 placeholder:text-slate-300 shadow-inner"
-                            />
-                        </div>
-
-                        {/* Password */}
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Security Key</label>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
                             <div className="relative">
+                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                    <UserIcon />
+                                </span>
                                 <input
-                                    type={showPassword ? 'text' : 'password'}
+                                    type="email"
                                     required
-                                    placeholder="Password Token"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
+                                    placeholder="name@institution.gov"
+                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Security Password</label>
+                            <div className="relative">
+                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                    <LockIcon />
+                                </span>
+                                <input
+                                    type="password"
+                                    required
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
-                                    className="w-full h-12 px-5 pr-12 bg-white/70 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all font-semibold text-slate-800 placeholder:text-slate-300 shadow-inner"
+                                    placeholder="••••••••••••"
+                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                                >
-                                    <EyeIcon open={showPassword} />
-                                </button>
                             </div>
                         </div>
 
-                        {/* Error */}
-                        {error && (
-                            <div className="rounded-2xl bg-red-50 border border-red-200 p-4 text-xs font-bold text-red-600 flex items-center gap-2">
-                                <span>⚠️</span> {error}
-                            </div>
-                        )}
+                        <AnimatePresence>
+                            {error && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="p-4 rounded-xl bg-rose-50 border border-rose-100 flex items-center gap-3 text-rose-600 text-xs font-semibold"
+                                >
+                                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center font-bold">!</span>
+                                    {error}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
-                        {/* Submit */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full h-12 rounded-2xl text-white font-black text-xs uppercase tracking-widest shadow-xl overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-                            style={{ background: 'linear-gradient(to right, #7c3aed, #6366f1)' }}
+                            className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-3"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                             {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Signing in…
-                                </span>
+                                <div className="h-5 w-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                             ) : (
-                                `Sign in as ${role === 'faculty' ? 'Faculty' : 'Student'}`
+                                'Sign In'
                             )}
                         </button>
                     </form>
 
-                    {/* Footer links */}
-                    <div className="space-y-4">
-                        {role === 'faculty' && (
-                            <div className="text-center text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                New faculty?{' '}
-                                <Link to="/faculty-register" className="text-violet-600 hover:text-violet-800 font-black transition-colors">
-                                    Register Here
-                                </Link>
-                            </div>
-                        )}
-                        {role === 'student' && (
-                            <div className="text-center text-xs font-medium text-slate-400 bg-amber-50 border border-amber-200 rounded-2xl p-3">
-                                ⚠️ Students cannot self-register. Your faculty will create your login credentials.
-                            </div>
-                        )}
+                    <div className="mt-10 pt-8 border-t border-slate-50 text-center">
+                        <p className="text-slate-500 text-xs font-medium">
+                            Don’t have an account?{' '}
+                            <Link to="/register" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">
+                                Create an account
+                            </Link>
+                        </p>
                     </div>
                 </div>
-            </div>
+
+                {/* Footer Branding */}
+                <div className="mt-8 text-center opacity-30 select-none">
+                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-900">Institutional Wellness Platform v5.0</p>
+                </div>
+            </motion.div>
         </div>
     );
 };
 
 export default Login;
+

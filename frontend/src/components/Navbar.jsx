@@ -46,37 +46,40 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-white shadow-md py-4 px-6 mb-8">
-            <div className="container mx-auto flex justify-between items-center">
-                <Link to="/" className="text-2xl font-bold text-blue-600">
-                    WellnessRisk
+        <nav className="bg-white/80 backdrop-blur-xl border-b border-slate-200 py-6 px-10 sticky top-0 z-50 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+            <div className="container mx-auto flex justify-between items-center relative z-10">
+                <Link to="/" className="text-3xl font-bold tracking-tight text-slate-900">
+                    Wellness<span className="text-blue-600">AI</span>
                 </Link>
-                <div className="space-x-4 flex items-center">
+                <div className="space-x-8 flex items-center">
                     {userInfo ? (
                         <>
                             {userInfo.role === 'student' && (
                                 <div
-                                    className={`relative mr-4 cursor-pointer p-2 rounded-full transition-all ${unreadCount > 0 ? 'bg-red-50 text-red-600' : 'text-slate-600 hover:bg-slate-100'}`}
+                                    className={`relative cursor-pointer p-3 rounded-2xl transition-all duration-500 backdrop-blur-3xl border ${unreadCount > 0 ? 'bg-blue-50 text-blue-600 border-blue-100 shadow-sm' : 'text-slate-400 border-slate-100 hover:text-blue-600 hover:bg-slate-50'}`}
                                     onClick={() => navigate('/student-dashboard')}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 2C10.35 2 9 3.35 9 5V5.27C6.18 6.07 4 8.64 4 11.73V17L2 19V20H22V19L20 17V11.73C20 8.64 17.82 6.07 15 5.27V5C15 3.35 13.65 2 12 2ZM12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22Z" />
                                     </svg>
                                     {unreadCount > 0 && (
-                                        <span className="absolute top-0 right-0 bg-red-600 text-white text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-white animate-pulse">
+                                        <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-bold h-5 w-5 rounded-full flex items-center justify-center border border-white shadow-lg animate-pulse">
                                             {unreadCount}
                                         </span>
                                     )}
                                 </div>
                             )}
-                            <span className="hidden md:inline text-slate-600 mr-2">Hello, {userInfo.name}</span>
-                            <button onClick={logoutHandler} className="btn-secondary">Logout</button>
+                            <span className="hidden md:inline text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                SESSION: <span className="text-slate-900">{userInfo.name}</span>
+                            </span>
+                            <button onClick={logoutHandler} className="px-5 py-2 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-[10px] font-bold uppercase tracking-widest hover:bg-rose-100 transition-all shadow-sm">Terminate</button>
                         </>
                     ) : (
                         <>
-                            <Link to="/faculty-login" className="text-slate-600 hover:text-blue-600 font-medium transition">Faculty</Link>
-                            <Link to="/student-login" className="text-slate-600 hover:text-blue-600 font-medium transition">Student</Link>
-                            <Link to="/faculty-register" className="btn-primary">Register</Link>
+                            <Link to="/faculty-login" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors">Access_Faculty</Link>
+                            <Link to="/student-login" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors">Access_Student</Link>
+                            <Link to="/faculty-register" className="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">Establish_Node</Link>
                         </>
                     )}
                 </div>

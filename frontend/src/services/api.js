@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
 });
 
 // Request interceptor to add token
@@ -31,5 +31,9 @@ export const getUnreadCount = () => API.get('/messages/unread-count');
 export const markMessagesRead = () => API.put('/messages/mark-read');
 export const getFacultyMessages = (studentId) => API.get(`/messages/faculty/${studentId}`);
 export const deleteMessage = (id) => API.delete(`/messages/${id}`);
+
+// AI APIs
+export const getAiAnalysis = () => API.get('/ai/analyze');
+export const askAi = (query) => API.post('/ai/query', { query });
 
 export default API;

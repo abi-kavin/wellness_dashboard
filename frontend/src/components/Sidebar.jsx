@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 
 /* ── Inline SVG Icons ── */
 const DashboardIcon = () => (
@@ -47,7 +46,7 @@ const HeartIcon = () => (
 
 const navItems = [
     { icon: DashboardIcon, label: 'Dashboard', path: '/faculty-dashboard' },
-    { icon: UsersIcon, label: 'Students', path: '/students' },
+    { icon: UsersIcon, label: 'Students', path: '/students', subPaths: ['/create-student', '/edit-student', '/students/'] },
     { icon: BarChartIcon, label: 'Analytics', path: '/analytics' },
     { icon: FileIcon, label: 'Reports', path: '/reports' },
     { icon: BellIcon, label: 'Alerts', path: '/alerts' },
@@ -55,6 +54,7 @@ const navItems = [
 
 const Sidebar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
 
     const handleLogout = () => {
@@ -63,63 +63,69 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-slate-800/60 bg-slate-900/95 backdrop-blur-xl text-white transition-all duration-300">
-            {/* Logo */}
+        <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col border-r border-slate-200 bg-white/80 backdrop-blur-2xl text-slate-900 transition-all duration-300 shadow-xl">
             <div className="flex items-center gap-3 px-6 py-8">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg shadow-violet-500/30"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1, #8b5cf6)' }}>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl shadow-lg shadow-blue-500/10"
+                    style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)' }}>
                     <HeartIcon />
                 </div>
                 <div>
-                    <h1 className="text-base font-black tracking-tight"
-                        style={{ background: 'linear-gradient(to right, #a78bfa, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    <h1 className="text-base font-bold tracking-tight text-slate-900">
                         Wellness AI
                     </h1>
-                    <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-400">Risk Analytics</p>
+                    <p className="text-[10px] uppercase tracking-wide font-bold text-slate-400">Risk Analytics</p>
                 </div>
             </div>
 
             {/* Nav Items */}
             <nav className="flex-1 space-y-1 px-4 py-2">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 relative overflow-hidden ${isActive
-                                ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30 scale-[1.02]'
-                                : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:scale-[1.01]'
-                            }`
-                        }
-                    >
-                        {({ isActive }) => (
-                            <>
-                                <span className={`transition-transform duration-300 group-hover:rotate-6 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-violet-400'}`}>
-                                    <item.icon />
-                                </span>
-                                {item.label}
-                                {isActive && <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/20 rounded-l-full" />}
-                            </>
-                        )}
-                    </NavLink>
-                ))}
+                {navItems.map((item) => {
+                    const isSubPathActive = item.subPaths?.some(sp => location.pathname.startsWith(sp));
+                    
+                    return (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) => {
+                                const active = isActive || isSubPathActive;
+                                return `group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all duration-300 relative overflow-hidden ${active
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 scale-[1.02]'
+                                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 hover:scale-[1.01]'
+                                }`;
+                            }}
+                        >
+                            {({ isActive }) => {
+                                const active = isActive || isSubPathActive;
+                                return (
+                                    <>
+                                        <span className={`transition-transform duration-300 group-hover:rotate-6 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`}>
+                                            <item.icon />
+                                        </span>
+                                        {item.label}
+                                        {active && <div className="absolute right-0 top-0 bottom-0 w-1 bg-white/40 rounded-l-full" />}
+                                    </>
+                                );
+                            }}
+                        </NavLink>
+                    );
+                })}
             </nav>
 
-            {/* Bottom: Settings + Logout */}
-            <div className="mt-auto p-4 border-t border-slate-800/60">
-                <div className="flex items-center justify-between rounded-xl bg-slate-800/60 p-2">
+            {/* Bottom: Settings */}
+            <div className="mt-auto p-4 border-t border-slate-100">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 border border-slate-100 p-2 backdrop-blur-md">
                     {/* User info */}
                     <div className="flex items-center gap-2 px-2">
-                        <div className="h-7 w-7 rounded-lg bg-violet-600 flex items-center justify-center text-xs font-black text-white">
+                        <div className="h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold text-white bg-blue-600 shadow-inner">
                             {userInfo?.name?.charAt(0) || 'F'}
                         </div>
-                        <span className="text-xs font-semibold text-slate-300 truncate max-w-[80px]">{userInfo?.name || 'Faculty'}</span>
+                        <span className="text-xs font-bold text-slate-700 truncate max-w-[80px]">{userInfo?.name || 'Faculty'}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <NavLink
                             to="/settings"
                             className={({ isActive }) =>
-                                `p-2 rounded-lg transition-colors ${isActive ? 'bg-violet-600 text-white' : 'text-slate-400 hover:bg-slate-700 hover:text-white'}`
+                                `p-2 rounded-lg transition-colors ${isActive ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-900'}`
                             }
                             title="Settings"
                         >
