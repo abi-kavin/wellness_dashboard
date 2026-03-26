@@ -6,7 +6,7 @@ const StudentSchema = new mongoose.Schema({
     name: { type: String, required: true },
     registerNumber: { type: String, required: true, unique: true },
     department: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
     facultyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty', required: true },
 

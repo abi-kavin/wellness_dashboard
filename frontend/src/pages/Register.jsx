@@ -25,7 +25,7 @@ const DeptIcon = () => (
 
 const Register = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Student' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Faculty', department: '' });
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
@@ -41,9 +41,11 @@ const Register = () => {
 
         setLoading(true);
         try {
-            await facultyRegister(formData);
+            const response = await facultyRegister(formData);
+            const { data } = response;
+            localStorage.setItem('userInfo', JSON.stringify({ ...data, role: 'faculty' }));
             setSuccess(true);
-            setTimeout(() => navigate('/login'), 2000);
+            setTimeout(() => navigate('/faculty-dashboard'), 2000);
         } catch (err) {
             setError(err.response?.data?.message || 'Registry Protocol Offline. Verify Terminal Data.');
         } finally {
@@ -93,7 +95,7 @@ const Register = () => {
                         <form onSubmit={handleSubmit} className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Role */}
-                                <div className="space-y-2 md:col-span-2">
+                                 <div className={`space-y-2 ${formData.role === 'Faculty' ? 'md:col-span-1' : 'md:col-span-2'}`}>
                                     <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">System Role</label>
                                     <div className="relative">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
@@ -102,84 +104,130 @@ const Register = () => {
                                         <select
                                             value={formData.role}
                                             onChange={update('role')}
-                                            className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-bold text-slate-900 appearance-none cursor-pointer"
+                                            className="w-full h-14 pl-14 pr-10 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-bold text-slate-900 appearance-none cursor-pointer"
                                         >
-                                            <option value="Student">Student</option>
-                                            <option value="Faculty">Faculty</option>
+                                            <option value="Faculty">Faculty Node (Registrar)</option>
+                                            <option value="Student">Student Node (View Only)</option>
                                         </select>
-                                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">▼</div>
+                                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Name */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
-                                            <UserIcon />
-                                        </span>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.name}
-                                            onChange={update('name')}
-                                            placeholder="Enter your full name"
-                                            className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
-                                        />
-                                    </div>
-                                </div>
+                                {/* Department - Only for Faculty or shown if role is Faculty */}
+                                {formData.role === 'Faculty' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="space-y-2"
+                                    >
+                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Department Domain</label>
+                                        <div className="relative">
+                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                <DeptIcon />
+                                            </span>
+                                            <select
+                                                required
+                                                value={formData.department}
+                                                onChange={update('department')}
+                                                className="w-full h-14 pl-14 pr-10 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-bold text-slate-900 appearance-none cursor-pointer"
+                                            >
+                                                <option value="">Select Domain</option>
+                                                <option value="CSE">CSE</option>
+                                                <option value="ECE">ECE</option>
+                                                <option value="IT">IT</option>
+                                                <option value="MECH">MECH</option>
+                                                <option value="CIVIL">CIVIL</option>
+                                            </select>
+                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
 
-                                {/* Email */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 font-bold ml-1">@</span>
-                                        <input
-                                            type="email"
-                                            required
-                                            value={formData.email}
-                                            onChange={update('email')}
-                                            placeholder="name@institution.protocol"
-                                            className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
-                                        />
+                                {formData.role === 'Student' ? (
+                                    <div className="md:col-span-2 py-8 px-6 bg-blue-50/50 rounded-3xl border border-blue-100/50 text-center">
+                                        <p className="text-sm font-bold text-blue-600 mb-2">Student Registration Protocol</p>
+                                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                            Students cannot self-register. Please contact your department faculty <br/>
+                                            to initialize your academic node and biometric profile.
+                                        </p>
                                     </div>
-                                </div>
+                                ) : (
+                                    <>
+                                        {/* Name */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <UserIcon />
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.name}
+                                                    onChange={update('name')}
+                                                    placeholder="Enter your full name"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
 
-                                {/* Password */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
-                                            <LockIcon />
-                                        </span>
-                                        <input
-                                            type="password"
-                                            required
-                                            value={formData.password}
-                                            onChange={update('password')}
-                                            placeholder="••••••••••••"
-                                            className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
-                                        />
-                                    </div>
-                                </div>
+                                        {/* Email */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 font-bold ml-1">@</span>
+                                                <input
+                                                    type="email"
+                                                    required
+                                                    value={formData.email}
+                                                    onChange={update('email')}
+                                                    placeholder="name@institution.protocol"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
 
-                                {/* Confirm Password */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Confirm Password</label>
-                                    <div className="relative">
-                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
-                                            <LockIcon />
-                                        </span>
-                                        <input
-                                            type="password"
-                                            required
-                                            value={confirmPassword}
-                                            onChange={e => setConfirmPassword(e.target.value)}
-                                            placeholder="Verify password"
-                                            className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
-                                        />
-                                    </div>
-                                </div>
+                                        {/* Password */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <LockIcon />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    required
+                                                    value={formData.password}
+                                                    onChange={update('password')}
+                                                    placeholder="••••••••••••"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Confirm Password */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <LockIcon />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    required
+                                                    value={confirmPassword}
+                                                    onChange={e => setConfirmPassword(e.target.value)}
+                                                    placeholder="Verify password"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
 
                             <AnimatePresence>
@@ -197,17 +245,26 @@ const Register = () => {
                             </AnimatePresence>
 
                             <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full sm:w-auto flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-3"
-                                >
-                                    {loading ? (
-                                        <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                    ) : (
-                                        'Create Account'
-                                    )}
-                                </button>
+                                {formData.role !== 'Student' ? (
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full sm:w-auto flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    >
+                                        {loading ? (
+                                            <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            'Create Account'
+                                        )}
+                                    </button>
+                                ) : (
+                                    <Link 
+                                        to="/login"
+                                        className="w-full sm:w-auto flex-1 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-blue-600/10 active:scale-[0.98] flex items-center justify-center gap-3"
+                                    >
+                                        Go to Login Portal
+                                    </Link>
+                                )}
 
                                 <div className="text-center sm:text-left">
                                     <p className="text-slate-500 text-xs font-medium">
@@ -232,4 +289,3 @@ const Register = () => {
 };
 
 export default Register;
-
