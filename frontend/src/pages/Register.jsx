@@ -1,298 +1,289 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { facultyRegister } from '../services/api';
+import logo from '../assets/logo.png';
 
-/* ── Inline Icons ── */
-const HeartIcon = () => (
-    <svg width="20" height="20" fill="white" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-    </svg>
-);
-const EyeIcon = ({ open }) => open ? (
-    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-    </svg>
-) : (
-    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-        <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-);
-const CheckIcon = () => (
-    <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+/* ── Professional Icons ── */
+const UserIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="opacity-50">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
     </svg>
 );
 
-const departments = ['CSE', 'ECE', 'IT', 'MECH', 'CIVIL', 'BIO', 'AGRI', 'FT', 'BT', 'CSBS'];
+const LockIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="opacity-50">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+);
 
-function getPasswordStrength(pwd) {
-    if (!pwd) return 0;
-    let s = 0;
-    if (pwd.length >= 8) s++;
-    if (pwd.length >= 12) s++;
-    if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) s++;
-    if (/\d/.test(pwd)) s++;
-    if (/[!@#$%^&*]/.test(pwd)) s++;
-    return s;
-}
-const strengthColors = ['bg-red-500', 'bg-red-500', 'bg-orange-400', 'bg-yellow-400', 'bg-emerald-500', 'bg-emerald-500'];
-const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong ✓', 'Strong ✓'];
+const DeptIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="opacity-50">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" /><polyline points="3.27 6.96 12 12.01 20.73 6.96" /><line x1="12" y1="22.08" x2="12" y2="12" />
+    </svg>
+);
 
 const Register = () => {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', department: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Faculty', department: '' });
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const strength = getPasswordStrength(formData.password);
-    const passwordMatch = formData.password && confirmPassword && formData.password === confirmPassword;
 
     const update = (field) => (e) => setFormData(prev => ({ ...prev, [field]: e.target.value }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        if (formData.password.length < 8) { setError('Password must be at least 8 characters.'); return; }
-        if (!passwordMatch) { setError('Passwords do not match.'); return; }
-        if (!formData.department) { setError('Please select your department.'); return; }
+        if (formData.password.length < 8) { setError('Access Token Complexity Incomplete. Minimum 8 characters required.'); return; }
+        if (formData.password !== confirmPassword) { setError('Access Token Verification Mismatch. Re-input confirmation key.'); return; }
 
         setLoading(true);
         try {
-            const { data } = await facultyRegister(formData);
+            const response = await facultyRegister(formData);
+            const { data } = response;
             localStorage.setItem('userInfo', JSON.stringify({ ...data, role: 'faculty' }));
             setSuccess(true);
-            setTimeout(() => navigate('/faculty-dashboard'), 1200);
+            setTimeout(() => navigate('/faculty-dashboard'), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            setError(err.response?.data?.message || 'Registry Protocol Offline. Verify Terminal Data.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex bg-slate-50 relative overflow-hidden">
-
-            {/* ── Left Brand Panel ── */}
-            <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden flex-col justify-between p-12"
-                style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #38bdf8 100%)' }}>
-                <div className="absolute top-[-80px] right-[-80px] h-64 w-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-                <div className="absolute bottom-[-80px] left-[-60px] h-72 w-72 rounded-full bg-sky-300/20 blur-3xl pointer-events-none" />
-                <div className="absolute inset-0 opacity-10 pointer-events-none"
-                    style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-
-                {/* Logo */}
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 border border-white/30 shadow-lg">
-                        <HeartIcon />
-                    </div>
-                    <div>
-                        <p className="text-white font-black text-sm tracking-wide">Wellness AI</p>
-                        <p className="text-white/70 text-[10px] uppercase tracking-widest font-semibold">Risk Analytics</p>
-                    </div>
-                </div>
-
-                {/* Main copy */}
-                <div className="relative z-10 space-y-8">
-                    <div className="inline-flex items-center gap-2 bg-white/20 border border-white/30 rounded-full px-4 py-2">
-                        <span className="text-yellow-300 text-lg">✨</span>
-                        <span className="text-white text-xs font-bold tracking-wide">Institutional Registry</span>
-                    </div>
-
-                    <h1 className="font-black text-5xl leading-tight text-white">
-                        Faculty &<br />
-                        <span className="text-yellow-300">Staff Portal.</span>
-                    </h1>
-
-                    <p className="text-white/90 text-lg font-medium leading-relaxed max-w-xs">
-                        Register as a department faculty member to manage your students and access advanced analytics.
-                    </p>
-
-                    {/* Role info cards */}
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-4 p-4 rounded-2xl border-2 bg-white/25 border-white/60 shadow-lg">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/30 shrink-0 text-xl">📖</div>
-                            <div>
-                                <p className="text-white font-black text-sm">Faculty Account</p>
-                                <p className="text-white/80 text-xs font-medium mt-0.5">Manage your department's students and analytics</p>
-                            </div>
-                        </div>
-                        <div className="p-4 bg-yellow-400/20 border-2 border-yellow-400/40 rounded-2xl">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="text-yellow-200">⚠️</span>
-                                <p className="text-white font-black text-xs uppercase">Student Notice</p>
-                            </div>
-                            <p className="text-white/80 text-[10px] leading-snug">
-                                Students cannot register themselves. Please contact your department faculty to receive your login credentials.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="relative z-10 text-white/60 text-xs font-medium">🔒 Secured & encrypted registry system</div>
+        <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-50 font-['Plus_Jakarta_Sans'] py-12 px-6">
+            {/* ── Background Elements ── */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-100/50 blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-100/50 blur-[120px]" />
             </div>
 
-            {/* ── Right Form Panel ── */}
-            <div className="flex-1 flex items-center justify-center p-6 lg:p-12 overflow-y-auto max-h-screen">
-                <div className="w-full max-w-md space-y-6 py-8">
-
-                    {/* Mobile logo */}
-                    <div className="flex lg:hidden items-center gap-3 mb-2">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl shadow-md" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
-                            <HeartIcon />
-                        </div>
-                        <span className="font-black text-lg text-slate-800">Faculty Registry</span>
-                    </div>
-
-                    <div>
-                        <h2 className="font-black text-4xl text-slate-800 leading-tight tracking-tight">Create Faculty Account</h2>
-                        <p className="text-slate-400 font-medium mt-2 text-sm">
-                            Register as an institutional authority for <span className="font-bold text-violet-600">your department</span>
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full max-w-[800px] z-10"
+            >
+                <div className="bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] border border-slate-100 p-10 sm:p-14 relative overflow-hidden text-center">
+                    {/* Header */}
+                    <div className="mb-12 flex flex-col items-center">
+                        <motion.img 
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            src={logo} 
+                            alt="Logo" 
+                            className="h-20 w-auto object-contain mb-8 filter drop-shadow-sm" 
+                        />
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
+                             Create New Account
+                        </h1>
+                        <p className="text-sm font-medium text-slate-500">
+                             Join the global institutional wellness platform
                         </p>
                     </div>
 
-                    {/* Alerts */}
-                    {success && (
-                        <div className="flex items-center gap-3 p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-emerald-800 font-bold text-sm">
-                            <CheckIcon /> Identity established! Redirecting…
+                    {success ? (
+                        <div className="py-12 text-center bg-emerald-50/50 rounded-3xl border border-emerald-100 animate-pulse">
+                            <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-lg shadow-emerald-200/50">✓</div>
+                            <h2 className="text-2xl font-bold text-slate-900 mb-2">Registration Successful</h2>
+                            <p className="text-slate-500 text-sm font-medium">Redirecting to login portal...</p>
                         </div>
-                    )}
-                    {error && (
-                        <div className="flex items-start gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-red-700 font-bold text-sm">
-                            <span className="mt-0.5">⚠️</span> {error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-
-                        {/* Department */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-black uppercase tracking-widest text-slate-400">Academic Department</label>
-                            <select
-                                required
-                                value={formData.department}
-                                onChange={update('department')}
-                                className="w-full h-12 px-4 bg-white border-2 border-slate-200 rounded-2xl text-slate-800 font-semibold focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all appearance-none"
-                            >
-                                <option value="">Choose Department</option>
-                                {departments.map(d => <option key={d} value={d}>{d}</option>)}
-                            </select>
-                        </div>
-
-                        {/* Full Name */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                            <input
-                                type="text"
-                                required
-                                placeholder="Your full name"
-                                value={formData.name}
-                                onChange={update('name')}
-                                className="w-full h-12 px-4 bg-white border-2 border-slate-200 rounded-2xl text-slate-800 font-semibold placeholder:text-slate-300 focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all"
-                            />
-                        </div>
-
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-black uppercase tracking-widest text-slate-400">Email Address</label>
-                            <input
-                                type="email"
-                                required
-                                placeholder="your.email@example.com"
-                                value={formData.email}
-                                onChange={update('email')}
-                                className="w-full h-12 px-4 bg-white border-2 border-slate-200 rounded-2xl text-slate-800 font-semibold placeholder:text-slate-300 focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all"
-                            />
-                        </div>
-
-                        {/* Password */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-black uppercase tracking-widest text-slate-400">Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    required
-                                    placeholder="Min. 8 characters"
-                                    value={formData.password}
-                                    onChange={update('password')}
-                                    className="w-full h-12 px-4 pr-12 bg-white border-2 border-slate-200 rounded-2xl text-slate-800 font-semibold placeholder:text-slate-300 focus:outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100 transition-all"
-                                />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                    <EyeIcon open={showPassword} />
-                                </button>
-                            </div>
-                            {formData.password && (
-                                <div className="px-1 pt-1 space-y-1">
-                                    <div className="flex gap-1 h-1.5">
-                                        {[...Array(5)].map((_, i) => (
-                                            <div key={i} className={`flex-1 rounded-full transition-all duration-500 ${i < strength ? strengthColors[strength] : 'bg-slate-200'}`} />
-                                        ))}
-                                    </div>
-                                    <p className="text-xs font-bold text-slate-400">
-                                        Strength: <span className={strength >= 4 ? 'text-emerald-600' : strength >= 3 ? 'text-yellow-600' : 'text-red-500'}>
-                                            {strengthLabels[strength]}
+                    ) : (
+                        <form onSubmit={handleSubmit} className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Role */}
+                                 <div className={`space-y-2 ${formData.role === 'Faculty' ? 'md:col-span-1' : 'md:col-span-2'}`}>
+                                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">System Role</label>
+                                    <div className="relative">
+                                        <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                            <DeptIcon />
                                         </span>
+                                        <select
+                                            value={formData.role}
+                                            onChange={update('role')}
+                                            className="w-full h-14 pl-14 pr-10 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-bold text-slate-900 appearance-none cursor-pointer"
+                                        >
+                                            <option value="Faculty">Faculty Node (Registrar)</option>
+                                            <option value="Student">Student Node (View Only)</option>
+                                        </select>
+                                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Department - Only for Faculty or shown if role is Faculty */}
+                                {formData.role === 'Faculty' && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="space-y-2"
+                                    >
+                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Department Domain</label>
+                                        <div className="relative">
+                                            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                <DeptIcon />
+                                            </span>
+                                            <select
+                                                required
+                                                value={formData.department}
+                                                onChange={update('department')}
+                                                className="w-full h-14 pl-14 pr-10 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-bold text-slate-900 appearance-none cursor-pointer"
+                                            >
+                                                <option value="">Select Domain</option>
+                                                <option value="CSE">CSE</option>
+                                                <option value="ECE">ECE</option>
+                                                <option value="IT">IT</option>
+                                                <option value="MECH">MECH</option>
+                                                <option value="CIVIL">CIVIL</option>
+                                            </select>
+                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                                                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+
+                                {formData.role === 'Student' ? (
+                                    <div className="md:col-span-2 py-8 px-6 bg-blue-50/50 rounded-3xl border border-blue-100/50 text-center">
+                                        <p className="text-sm font-bold text-blue-600 mb-2">Student Registration Protocol</p>
+                                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                                            Students cannot self-register. Please contact your department faculty <br/>
+                                            to initialize your academic node and biometric profile.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Name */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <UserIcon />
+                                                </span>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={formData.name}
+                                                    onChange={update('name')}
+                                                    placeholder="Enter your full name"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Email */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 font-bold ml-1">@</span>
+                                                <input
+                                                    type="email"
+                                                    required
+                                                    value={formData.email}
+                                                    onChange={update('email')}
+                                                    placeholder="name@institution.protocol"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Password */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <LockIcon />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    required
+                                                    value={formData.password}
+                                                    onChange={update('password')}
+                                                    placeholder="••••••••••••"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Confirm Password */}
+                                        <div className="space-y-2">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                                            <div className="relative">
+                                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300">
+                                                    <LockIcon />
+                                                </span>
+                                                <input
+                                                    type="password"
+                                                    required
+                                                    value={confirmPassword}
+                                                    onChange={e => setConfirmPassword(e.target.value)}
+                                                    placeholder="Verify password"
+                                                    className="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none font-medium text-slate-900"
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+
+                            <AnimatePresence>
+                                {error && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="p-4 rounded-xl bg-rose-50 border border-rose-100 flex items-center gap-3 text-rose-600 text-xs font-semibold"
+                                    >
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center font-bold">!</span>
+                                        {error}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
+                                {formData.role !== 'Student' ? (
+                                    <button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full sm:w-auto flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-3"
+                                    >
+                                        {loading ? (
+                                            <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        ) : (
+                                            'Create Account'
+                                        )}
+                                    </button>
+                                ) : (
+                                    <Link 
+                                        to="/login"
+                                        className="w-full sm:w-auto flex-1 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm tracking-wider transition-all duration-300 shadow-xl shadow-blue-600/10 active:scale-[0.98] flex items-center justify-center gap-3"
+                                    >
+                                        Go to Login Portal
+                                    </Link>
+                                )}
+
+                                <div className="text-center sm:text-left">
+                                    <p className="text-slate-500 text-xs font-medium">
+                                        Already a member?<br />
+                                        <Link to="/login" className="text-blue-600 font-bold hover:text-blue-700 transition-colors">
+                                            Sign In here
+                                        </Link>
                                     </p>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Confirm Password */}
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-black uppercase tracking-widest text-slate-400">Confirm Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showConfirm ? 'text' : 'password'}
-                                    required
-                                    placeholder="Re-enter your password"
-                                    value={confirmPassword}
-                                    onChange={e => setConfirmPassword(e.target.value)}
-                                    className={`w-full h-12 px-4 pr-12 bg-white border-2 rounded-2xl text-slate-800 font-semibold placeholder:text-slate-300 focus:outline-none focus:ring-4 transition-all ${confirmPassword
-                                            ? passwordMatch ? 'border-emerald-400 focus:ring-emerald-100' : 'border-red-400 focus:ring-red-100'
-                                            : 'border-slate-200 focus:border-violet-400 focus:ring-violet-100'
-                                        }`}
-                                />
-                                <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                                    <EyeIcon open={showConfirm} />
-                                </button>
                             </div>
-                            {confirmPassword && !passwordMatch && (
-                                <p className="text-xs font-semibold text-red-500 ml-1">Passwords do not match</p>
-                            )}
-                            {confirmPassword && passwordMatch && (
-                                <p className="text-xs font-semibold text-emerald-600 ml-1">✓ Passwords match</p>
-                            )}
-                        </div>
-
-                        {/* Submit */}
-                        <button
-                            type="submit"
-                            disabled={loading || !formData.name.trim() || strength < 2 || !passwordMatch}
-                            className="w-full h-14 mt-2 rounded-2xl text-white font-black text-sm uppercase tracking-widest shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 flex items-center justify-center gap-2"
-                            style={{ background: 'linear-gradient(to right, #7c3aed, #6366f1)' }}
-                        >
-                            {loading ? (
-                                <>
-                                    <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Creating…
-                                </>
-                            ) : 'Create Account →'}
-                        </button>
-                    </form>
-
-                    <p className="text-center text-sm font-medium text-slate-400">
-                        Already have an account?{' '}
-                        <Link to="/login" className="font-black text-violet-600 hover:text-violet-800 transition-colors">Sign In</Link>
-                    </p>
+                        </form>
+                    )}
                 </div>
-            </div>
+
+                {/* Footer Branding */}
+                <div className="mt-8 text-center opacity-30 select-none">
+                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-900">Institutional Wellness Platform v5.0</p>
+                </div>
+            </motion.div>
         </div>
     );
 };

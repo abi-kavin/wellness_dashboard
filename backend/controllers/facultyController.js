@@ -4,11 +4,12 @@ const jwt = require('jsonwebtoken');
 const registerFaculty = async (req, res) => {
     const { name, department, email, password } = req.body;
 
+    const normalizedEmail = email.toLowerCase();
     try {
-        const facultyExists = await Faculty.findOne({ email });
+        const facultyExists = await Faculty.findOne({ email: normalizedEmail });
         if (facultyExists) return res.status(400).json({ message: 'Faculty already exists' });
 
-        const faculty = await Faculty.create({ name, department, email, password });
+        const faculty = await Faculty.create({ name, department, email: normalizedEmail, password });
         if (faculty) {
             res.status(201).json({
                 _id: faculty._id,
@@ -16,6 +17,7 @@ const registerFaculty = async (req, res) => {
                 department: faculty.department,
                 email: faculty.email,
                 token: generateToken(faculty._id),
+                role: 'faculty',
             });
         } else {
             res.status(400).json({ message: 'Invalid faculty data' });
@@ -28,8 +30,9 @@ const registerFaculty = async (req, res) => {
 const loginFaculty = async (req, res) => {
     const { email, password } = req.body;
 
+    const normalizedEmail = email.toLowerCase();
     try {
-        const faculty = await Faculty.findOne({ email });
+        const faculty = await Faculty.findOne({ email: normalizedEmail });
         if (faculty && (await faculty.comparePassword(password))) {
             res.json({
                 _id: faculty._id,

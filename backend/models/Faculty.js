@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const FacultySchema = new mongoose.Schema({
     name: { type: String, required: true },
     department: { type: String, enum: ['CSE', 'ECE', 'IT', 'MECH', 'CIVIL'], required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
 }, { timestamps: true });
 

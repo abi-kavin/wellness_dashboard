@@ -1,65 +1,73 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 
-// ── Auth / Landing pages ──
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-import FacultyLogin from './pages/FacultyLogin.jsx';    // kept for legacy link support
-import FacultyRegister from './pages/FacultyRegister.jsx'; // kept for legacy link support
-import StudentLogin from './pages/StudentLogin.jsx';    // kept for legacy link support
+// ── Lazy Loading Pages ──
+const Landing = lazy(() => import('./pages/Landing.jsx'));
+const Login = lazy(() => import('./pages/Login.jsx'));
+const Register = lazy(() => import('./pages/Register.jsx'));
+const FacultyDashboard = lazy(() => import('./pages/FacultyDashboard.jsx'));
+const StudentDashboard = lazy(() => import('./pages/StudentDashboard.jsx'));
+const Students = lazy(() => import('./pages/Students.jsx'));
+const StudentDetail = lazy(() => import('./pages/StudentDetail.jsx'));
+const CreateStudent = lazy(() => import('./pages/CreateStudent.jsx'));
+const Analytics = lazy(() => import('./pages/Analytics.jsx'));
+const Reports = lazy(() => import('./pages/Reports.jsx'));
+const Settings = lazy(() => import('./pages/Settings.jsx'));
+const Alerts = lazy(() => import('./pages/Alerts.jsx'));
+const FacultyLogin = lazy(() => import('./pages/FacultyLogin.jsx'));
+const FacultyRegister = lazy(() => import('./pages/FacultyRegister.jsx'));
+const StudentLogin = lazy(() => import('./pages/StudentLogin.jsx'));
 
-// ── Faculty pages (sidebar via FacultyLayout) ──
-import FacultyDashboard from './pages/FacultyDashboard.jsx';
-import Students from './pages/Students.jsx';
-import StudentDetail from './pages/StudentDetail.jsx';
-import Analytics from './pages/Analytics.jsx';
-import Reports from './pages/Reports.jsx';
-import Alerts from './pages/Alerts.jsx';
-import Settings from './pages/Settings.jsx';
-import CreateStudent from './pages/CreateStudent.jsx';
+// Placeholder Loading Component
+const LoadingScreen = () => (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="h-12 w-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+    </div>
+);
 
-// ── Student pages ──
-import StudentDashboard from './pages/StudentDashboard.jsx';
+const AnimatedRoutes = () => {
+    const location = useLocation();
 
-function App() {
     return (
-        <Router>
-            <Routes>
-                {/* ── Default: go to login ── */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
-
-                {/* ── Public Auth Routes ── */}
+        <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<Landing />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                {/* Legacy routes kept so old bookmarks still work */}
+                
+                {/* Faculty Routes */}
+                <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
+                <Route path="/students" element={<Students />} />
+                <Route path="/students/:id" element={<StudentDetail />} />
+                <Route path="/create-student" element={<CreateStudent />} />
+                <Route path="/edit-student/:id" element={<CreateStudent />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/reports" element={<Reports />} />
                 <Route path="/faculty-login" element={<FacultyLogin />} />
                 <Route path="/faculty-register" element={<FacultyRegister />} />
+
+                {/* Student Routes */}
+                <Route path="/student-dashboard" element={<StudentDashboard />} />
                 <Route path="/student-login" element={<StudentLogin />} />
 
-                {/* ── Protected Faculty Routes ── */}
-                <Route element={<ProtectedRoute role="faculty" />}>
-                    <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
-                    <Route path="/students" element={<Students />} />
-                    <Route path="/students/:id" element={<StudentDetail />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/reports" element={<Reports />} />
-                    <Route path="/alerts" element={<Alerts />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/create-student" element={<CreateStudent />} />
-                    <Route path="/edit-student/:id" element={<CreateStudent />} />
-                </Route>
-
-                {/* ── Protected Student Routes ── */}
-                <Route element={<ProtectedRoute role="student" />}>
-                    <Route path="/student-dashboard" element={<StudentDashboard />} />
-                </Route>
-
-                {/* ── 404 fallback ── */}
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                {/* Common Protected Routes */}
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/alerts" element={<Alerts />} />
             </Routes>
+        </AnimatePresence>
+    );
+};
+
+const App = () => {
+    return (
+        <Router>
+            <Suspense fallback={<LoadingScreen />}>
+                <AnimatedRoutes />
+            </Suspense>
         </Router>
     );
-}
+};
 
 export default App;
+
