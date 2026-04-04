@@ -23,6 +23,13 @@ const DeptIcon = () => (
     </svg>
 );
 
+const HomeIcon = () => (
+    <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+);
+
 const Register = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Faculty', department: '' });
@@ -55,6 +62,18 @@ const Register = () => {
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-50 font-['Plus_Jakarta_Sans'] py-12 px-6">
+            {/* ── Home Navigation Button ── */}
+            <motion.button
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/')}
+                className="absolute top-8 left-8 flex items-center gap-2 px-5 py-2.5 bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl text-slate-600 text-xs font-bold shadow-sm hover:text-blue-600 hover:border-blue-200 transition-all z-20"
+            >
+                <HomeIcon />
+                <span>Return to Home</span>
+            </motion.button>
             {/* ── Background Elements ── */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-100/50 blur-[120px]" />
