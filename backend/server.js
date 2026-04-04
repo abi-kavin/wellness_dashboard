@@ -22,7 +22,10 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        if (!origin) return callback(null, true);
+        // Allow exact matches or origins that start with an allowed origin
+        const allowed = allowedOrigins.some(a => a && (origin === a || origin.startsWith(a)));
+        if (allowed) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
