@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+// Prefer an explicit Vite env var. If missing, fall back to your deployed backend
+// URL so the app works even if envs were not configured in Vercel.
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'https://wellness-dashboard.onrender.com/api',
 });
 
 // Request interceptor to add token

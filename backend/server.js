@@ -12,9 +12,12 @@ connectDB();
 
 const app = express();
 
+// Allow localhost for local dev, the configured FRONTEND_URL, and
+// fall back to the known Vercel domain so deployed frontend can reach the API
 const allowedOrigins = [
     'http://localhost:3000',
-    process.env.FRONTEND_URL
+    process.env.FRONTEND_URL,
+    'https://wellness-dashboard-nine.vercel.app'
 ].filter(Boolean);
 
 app.use(cors({
