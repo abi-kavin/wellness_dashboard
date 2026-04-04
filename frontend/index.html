@@ -8,6 +8,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Runtime API base override (helps when Vercel env not set) -->
+    <script>
+      (function(){
+        try {
+          if (!window.__API_BASE) {
+            window.__API_BASE = 'https://wellness-dashboard.onrender.com/api';
+            console.log('Runtime: set window.__API_BASE to', window.__API_BASE);
+          }
+        } catch(e) { console.warn('Runtime API override failed', e); }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
